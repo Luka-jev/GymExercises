@@ -310,7 +310,6 @@
   </footer>
 
   <script>
-
     // --- Gestion affichage des images au clic ---
     document.querySelectorAll(".exercise").forEach(item => {
       item.addEventListener("click", () => {
@@ -351,18 +350,50 @@
       }
       lastScroll = currentScroll;
     });
+  </script>
 
+  <script>
     document.addEventListener('DOMContentLoaded', () => {
         const display = document.getElementById('timerDisplay');
         const options = document.getElementById('timerOptions');
         const buttons = document.querySelectorAll('.timer-btn');
         
         let countdown; // Variable pour le setInterval
-        let totalSeconds;
+        let endTime;   // On stocke l'heure de fin
         let isRunning = false;
         const defaultTitle = document.title;
         
-        // --- Fonction pour afficher le temps formaté ---
+        // Son de l'alarme
+        const alarmSound = new Audio('https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg');
+        alarmSound.volume = 0.4; // Ne pas mettre trop fort
+
+        // Variable pour stocker le Wake Lock
+        let wakeLock = null;
+
+        // Fonction pour demander le Wake Lock
+        const requestWakeLock = async () => {
+          // Vérifie si le navigateur supporte l'API
+          if ('wakeLock' in navigator) {
+            try {
+              wakeLock = await navigator.wakeLock.request('screen');
+              console.log('Wake Lock activé (écran restera allumé)');
+            } catch (err) {
+              // L'utilisateur a peut-être refusé, ou c'est non supporté
+              console.error(`Wake Lock impossible: ${err.name}, ${err.message}`);
+            }
+          }
+        };
+
+        // Fonction pour libérer le Wake Lock
+        const releaseWakeLock = () => {
+          if (wakeLock) {
+            wakeLock.release();
+            wakeLock = null;
+            console.log('Wake Lock libéré');
+          }
+        };
+
+        // --- Fonction pour afficher le temps formaté (en secondes) ---
         function displayTime(seconds) {
             const mins = Math.floor(seconds / 60);
             const secs = seconds % 60;
@@ -377,52 +408,71 @@
                 document.title = `${displayStr} - ${defaultTitle}`;
             }
         }
+        
+        // --- Fonction "tick" (appelée chaque seconde) ---
+        function tick() {
+            // Calcule le temps restant en millisecondes
+            const msRestantes = endTime - Date.now();
+            // Convertit en secondes (en arrondissant au plus proche)
+            const secondesRestantes = Math.round(msRestantes / 1000);
+
+            if (secondesRestantes <= 0) {
+                // Le temps est écoulé
+                displayTime(0); // Assure l'affichage de 0:00
+                stopTimer(true); // Arrête le timer (true = c'est fini)
+                
+                alarmSound.play();
+                document.title = "FINI ! - " + defaultTitle;
+                
+                // Réaffiche les options après 2 secondes
+                setTimeout(() => {
+                    options.classList.remove('hidden');
+                    document.title = defaultTitle;
+                }, 2000);
+
+            } else {
+                // Il reste du temps
+                displayTime(secondesRestantes);
+            }
+        }
 
         // --- Fonction pour démarrer le timer ---
-        function startTimer() {
-            if (isRunning) return; // Sécurité pour ne pas lancer 2 timers
+        function startTimer(durationInSeconds) {
+            if (isRunning) return; 
             
             isRunning = true;
-            display.classList.add('running'); // Ajoute la classe pour le style CSS
-            options.classList.add('hidden'); // Cache les boutons de choix
+            // Calcule l'heure de fin exacte
+            endTime = Date.now() + (durationInSeconds * 1000);
 
-            displayTime(totalSeconds); // Affiche le temps de départ immédiatement
+            display.classList.add('running');
+            options.classList.add('hidden');
 
-            countdown = setInterval(() => {
-                totalSeconds--;
-                displayTime(totalSeconds);
+            // Demande à garder l'écran allumé
+            requestWakeLock();
 
-                // --- Quand le timer arrive à zéro ---
-                if (totalSeconds <= 0) {
-                    stopTimer(true); // Arrête le timer
-                    alarmSound.play(); // Joue le son
-                    document.title = "FINI ! - " + defaultTitle;
-                    
-                    // Réaffiche les options après 2 secondes
-                    setTimeout(() => {
-                        options.classList.remove('hidden');
-                        document.title = defaultTitle;
-                    }, 2000);
-                }
-            }, 1000); // Met à jour chaque seconde
+            tick(); // Appelle une première fois pour afficher le temps de départ
+            countdown = setInterval(tick, 1000); // Lance la boucle
         }
 
         // --- Fonction pour arrêter le timer ---
-        // 'finished' est un booléen pour savoir si le timer s'arrête 
-        // parce qu'il est fini (true) ou s'il est annulé (false)
         function stopTimer(finished = false) {
             clearInterval(countdown);
             isRunning = false;
             display.classList.remove('running');
             document.title = defaultTitle;
+
+            // Libère le verrou de l'écran
+            releaseWakeLock();
             
             if (!finished) {
-                // Si annulé, on remet tout à zéro tout de suite
-                display.textContent = "0:00";
+                // Si annulé par l'utilisateur, on remet tout à zéro
+                displayTime(0);
                 options.classList.remove('hidden');
             }
             // Si 'finished' est true, on laisse "0:00" et le startTimer gère la suite
         }
+
+        // --- Écouteurs d'événements ---
 
         // 1. Clic sur l'affichage du temps
         display.addEventListener('click', () => {
@@ -438,14 +488,14 @@
         buttons.forEach(button => {
             button.addEventListener('click', () => {
                 // Récupère le temps en secondes depuis l'attribut 'data-time'
-                totalSeconds = parseInt(button.dataset.time);
-                startTimer();
+                const totalSeconds = parseInt(button.dataset.time);
+                startTimer(totalSeconds); // On passe les secondes à startTimer
             });
         });
         
         // Initialiser l'affichage à 0:00
         displayTime(0);
-        // Cacher les options au début (commentez cette ligne si vous voulez les voir direct)
+        // Cacher les options au début
         options.classList.add('hidden');
     });
   </script>
