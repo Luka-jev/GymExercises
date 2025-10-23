@@ -29,7 +29,8 @@ class IndexController:
             {"exo": "Curl incliné haltères", "img": "https://www.docteur-fitness.com/wp-content/uploads/2021/10/curl-haltere-incline.gif"},
             {"exo": "Curl marteau", "img": "https://www.fitadium.com/conseils/wp-content/uploads/2020/11/03131301-Dumbbell-Hammer-Curl_Forearm_720.gif"},
             {"exo": "Curl pupitre", "img": "https://www.docteur-fitness.com/wp-content/uploads/2022/01/curl-au-pupitre-barre-ez-larry-scott.gif"},
-            {"exo": "Curl à la poulie basse", "img": "https://www.docteur-fitness.com/wp-content/uploads/2021/10/curl-biceps-poulie-basse.gif"}
+            {"exo": "Curl à la poulie basse", "img": "https://www.docteur-fitness.com/wp-content/uploads/2021/10/curl-biceps-poulie-basse.gif"},
+            {"exo": "Curl inversé", "img" : "https://www.docteur-fitness.com/wp-content/uploads/2022/04/curl-inverse-barre.gif"}
         ]
 
         pecs = [
@@ -56,7 +57,8 @@ class IndexController:
             {"exo": "Rowing haltère unilatéral", "img": "https://louismove.com/wp-content/uploads/2022/12/02921101-Dumbbell-Bent-over-Row_back_Back-AFIX_medium.png.webp"},
             {"exo": "Tirage vertical poulie haute", "img": "https://louismove.com/wp-content/uploads/2022/12/01971101-Cable-Wide-Pulldown_Back-FIX_medium.png.webp"},
             {"exo": "Tirage horizontal poulie basse", "img": "https://louismove.com/wp-content/uploads/2022/12/26611101-Cable-Seated-Row-with-V-bar_Back_medium.png.webp"},
-            {"exo": "Pull-over à la poulie", "img": "https://louismove.com/wp-content/uploads/2022/12/60361101-Cable-Straight-Arm-Pulldown-VERSION-2_Back_medium.png"}
+            {"exo": "Pull-over à la poulie", "img": "https://louismove.com/wp-content/uploads/2022/12/60361101-Cable-Straight-Arm-Pulldown-VERSION-2_Back_medium.png"},
+            {"exo": "Machine Row", "img": "https://fitnessprogramer.com/wp-content/uploads/2021/02/Seated-Row-Machine.gif"}       
         ]
 
         abdos = [
@@ -65,7 +67,8 @@ class IndexController:
             {"exo": "Crunch à la poulie haute", "img": "https://www.docteur-fitness.com/wp-content/uploads/2000/06/crunch-poulie-haute-exercice-musculation.gif"},
             {"exo": "Rotation du buste machine", "img": "https://www.docteur-fitness.com/wp-content/uploads/2022/02/rotation-buste-debout-poulie.gif"},
             {"exo": "Gainage lesté", "img": "https://www.docteur-fitness.com/wp-content/uploads/2022/05/planche-abdos.gif"},
-            {"exo": "Planche latérale", "img": "https://www.docteur-fitness.com/wp-content/uploads/2022/08/planche-laterale-avec-rotation.gif"}
+            {"exo": "Planche latérale", "img": "https://www.docteur-fitness.com/wp-content/uploads/2022/08/planche-laterale-avec-rotation.gif"},
+            {"exo": "High row machine", "img": "https://image.tuasaude.com/media/article/us/io/back-workout_44335.gif?width=686&height=487"}
         ]
 
         return render_template('index.html', triceps=triceps, jambes=jambes, biceps=biceps, pecs=pecs, epaules=epaules, dos=dos, abdos=abdos)
@@ -73,4 +76,26 @@ class IndexController:
 
     @app.route('/seance', methods=['GET'])
     def seance():
-        return render_template('seance.html')
+
+        push = [
+            {"exo": "Développé couché barre", "img": "https://muscu-street-et-crossfit.fr/wp-content/uploads/2021/09/Muscles-DC.001-980x551.jpeg"},
+            {"exo": "Développé incliné haltères", "img": "https://louismove.com/wp-content/uploads/2022/12/03141101-Dumbbell-Incline-Bench-Press_Chest-FIX_medium-1.png.webp"},
+            {"exo": "Pec fly machine", "img": "https://training.fit/wp-content/uploads/2020/02/butterflys-800x448.png"},
+            {"exo": "Développé militaire barre", "img": "https://muscu-street-et-crossfit.fr/wp-content/uploads/2022/03/Muscles-DM-Halteres.001-980x551.jpeg"},
+            {"exo": "Élévations latérales", "img": "https://www.fitadium.com/conseils/wp-content/uploads/2020/08/03341301-Dumbbell-Lateral-Raise_shoulder_720.gif"},
+            {"exo": "Élévations frontales", "img": "https://www.fitadium.com/conseils/wp-content/uploads/2020/08/03101301-Dumbbell-Front-Raise_Shoulders_720.gif"},
+            {"exo": "Extension corde à la poulie", "img": "https://www.docteur-fitness.com/wp-content/uploads/2021/10/extension-triceps-poulie-haute-corde.gif"},
+            {"exo": "Dips", "img": "https://louismove.com/wp-content/uploads/2022/12/02511101-Chest-Dip_Chest_medium.png.webp"}
+        ]
+
+        pull = [
+            {"exo": "Curl haltères alterné", "img": "https://www.docteur-fitness.com/wp-content/uploads/2022/08/curl-biceps-avec-halteres-alterne.gif"},
+            {"exo": "Curl incliné haltères", "img": "https://www.docteur-fitness.com/wp-content/uploads/2021/10/curl-haltere-incline.gif"},
+            {"exo": "Curl inversé", "img" : "https://www.docteur-fitness.com/wp-content/uploads/2022/04/curl-inverse-barre.gif"},
+            {"exo": "Curl pupitre", "img": "https://www.docteur-fitness.com/wp-content/uploads/2022/01/curl-au-pupitre-barre-ez-larry-scott.gif"},
+            {"exo": "Tirage vertical poulie haute", "img": "https://louismove.com/wp-content/uploads/2022/12/01971101-Cable-Wide-Pulldown_Back-FIX_medium.png.webp"},
+            {"exo": "Tirage horizontal poulie basse", "img": "https://louismove.com/wp-content/uploads/2022/12/26611101-Cable-Seated-Row-with-V-bar_Back_medium.png.webp"},
+            {"exo": "High row machine", "img": "https://image.tuasaude.com/media/article/us/io/back-workout_44335.gif?width=686&height=487"},
+            {"exo": "Machine Row", "img": "https://fitnessprogramer.com/wp-content/uploads/2021/02/Seated-Row-Machine.gif"}       
+        ]
+        return render_template('seance.html', push = push, pull=pull)

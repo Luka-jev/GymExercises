@@ -106,6 +106,103 @@
       margin-top: auto;
     }
     footer span { font-weight: 600; color: #000; }
+    
+    /* --- CSS DU TIMER (AJOUT) --- */
+    .timer-wrapper {
+      margin: 30px auto 50px; /* Espace le timer */
+      padding: 25px;
+      background: #f9f9f9; /* Fond très léger, comme le footer */
+      border-radius: 12px;
+      max-width: 450px; /* Largeur max du bloc timer */
+      box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+      border: 1px solid #eee;
+    }
+
+    #timerDisplay {
+      font-size: 5.5rem; /* Très grand */
+      font-weight: 700;
+      color: #333;
+      padding: 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.3s, color 0.3s;
+      /* Police à largeur fixe pour éviter que le texte ne "saute" */
+      font-family: 'Courier New', Courier, monospace; 
+      line-height: 1.1;
+      user-select: none; /* Empêche la sélection du texte */
+    }
+    
+    /* État lorsque le timer tourne */
+    #timerDisplay.running {
+      color: #0077ff; /* Couleur accent de votre thème */
+    }
+    
+    /* État au survol (quand arrêté) */
+    #timerDisplay:not(.running):hover {
+      background: #f0f0f0;
+    }
+
+    #timerOptions {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 20px;
+      flex-wrap: wrap;
+      transition: max-height 0.3s ease-out, opacity 0.3s ease-out, margin-top 0.3s ease-out;
+      overflow: hidden;
+      max-height: 100px; /* Hauteur suffisante pour les boutons */
+      opacity: 1;
+    }
+
+    /* Classe pour cacher les options */
+    #timerOptions.hidden {
+      max-height: 0;
+      opacity: 0;
+      margin-top: 0;
+    }
+
+        .exercise {
+      display: flex;
+      justify-content: center;
+      width: 100%;
+      padding: 10px;
+      margin: 5px 0;
+      background: none;
+      border: none;
+      cursor: pointer;
+      text-align: left;
+      font-size: 1rem;
+      color: #000;
+      position: relative;
+    }
+
+    .exercise:hover {
+      background: rgba(0, 119, 255, 0.1);
+    }
+
+    .timer-btn {
+      /* Reprend le style de vos liens de nav */
+      text-decoration: none;
+      color: #000;
+      background: #fff;
+      border: 1px solid #ccc;
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      font-weight: 600;
+      font-size: 1rem;
+      padding: 0.75rem 1rem;
+      border-radius: 6px;
+      transition: background 0.3s, color 0.3s, transform 0.3s;
+      cursor: pointer;
+    }
+
+    .timer-btn:hover {
+      /* Reprend le hover de vos liens de nav */
+      color: #0077ff;
+      background: rgba(0, 119, 255, 0.1);
+      border-color: rgba(0, 119, 255, 0.3);
+    }
+    /* --- FIN CSS DU TIMER --- */
+
 
     /* --- Mobile menu animation et décalage --- */
     @media (max-width: 768px) {
@@ -140,6 +237,15 @@
 
       .menu-toggle { display: block; transition: transform 0.3s ease; }
       .menu-toggle.active { transform: rotate(90deg); }
+      
+      /* --- Adaptation mobile du timer --- */
+      #timerDisplay {
+        font-size: 4rem; /* Un peu plus petit sur mobile */
+      }
+      .timer-btn {
+        font-size: 0.9rem;
+        padding: 0.6rem 0.8rem;
+      }
     }
   </style>
 </head>
@@ -162,11 +268,40 @@
     <h1>Séance Push Pull Legs<br>Programme</h1>
 
     <img src="https://fitnessprogramer.com/wp-content/uploads/2024/12/push-day-workout-1200x675.webp" alt="Push Day">
-    <br><br><br><br><br><br><br><br><br><br>
+    <br><br><br><br><br>
+
+        <section id="push">
+          <h2>Exercice perso - Push</h2>
+          {% for exo in push %}
+            <div class="exercise" data-gif="{{exo['img']}}">{{exo['exo']}}</div>
+          {% endfor %}
+          <div class="gif-container"></div>
+        </section>
+
+    <br><br><br><br><br>
     <img src="https://fitnessprogramer.com/wp-content/uploads/2024/12/Pull-day-workout-for-3-day-ppl-workout-1200x675.webp" alt="Pull Day">
-    <br><br><br><br><br><br><br><br><br><br>
+    <br><br><br><br><br>  
+        
+        <section id="pull">
+          <h2>Exercice perso - Pull</h2>
+          {% for exo in pull %}
+            <div class="exercise" data-gif="{{exo['img']}}">{{exo['exo']}}</div>
+          {% endfor %}
+          <div class="gif-container"></div>
+        </section>
+
+    <br><br><br><br><br>
     <img src="https://cdn.shopify.com/s/files/1/0591/3156/0089/files/download_1.jpg?v=1719996730" alt="Legs Day">
 
+    <div class="timer-wrapper">
+      <div id="timerDisplay" title="Cliquez pour choisir le temps ou arrêter">0:00</div>
+      <div id="timerOptions">
+          <button class="timer-btn" data-time="60">1:00 min</button>
+          <button class="timer-btn" data-time="90">1:30 min</button>
+          <button class="timer-btn" data-time="120">2:00 min</button>
+          <button class="timer-btn" data-time="150">2:30 min</button>
+      </div>
+    </div>
     
   </main>
 
@@ -175,6 +310,24 @@
   </footer>
 
   <script>
+
+    // --- Gestion affichage des images au clic ---
+    document.querySelectorAll(".exercise").forEach(item => {
+      item.addEventListener("click", () => {
+        const imgUrl = item.getAttribute("data-gif");
+        const parentSection = item.parentElement;
+        const gifContainer = parentSection.querySelector(".gif-container");
+
+        if (gifContainer.innerHTML.includes(imgUrl)) {
+          gifContainer.innerHTML = "";
+          return;
+        }
+
+        parentSection.querySelectorAll(".gif-container").forEach(container => container.innerHTML = "");
+        gifContainer.innerHTML = `<img src="${imgUrl}" alt="Exercice" style="max-width: 100%; margin-top: 10px;">`;
+      });
+    });
+
     // --- Toggle menu mobile ---
     const menuToggle = document.getElementById('menu-toggle');
     const navbar = document.getElementById('navbar');
@@ -189,11 +342,111 @@
     window.addEventListener('scroll', () => {
       const currentScroll = window.pageYOffset;
       if (currentScroll > lastScroll && currentScroll > 100) {
-        navbar.style.top = '-100px';
+        // Ne masque pas la nav si le menu mobile est ouvert
+        if (!navbar.classList.contains('open')) {
+          navbar.style.top = '-100px';
+        }
       } else {
         navbar.style.top = '0';
       }
       lastScroll = currentScroll;
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const display = document.getElementById('timerDisplay');
+        const options = document.getElementById('timerOptions');
+        const buttons = document.querySelectorAll('.timer-btn');
+        
+        let countdown; // Variable pour le setInterval
+        let totalSeconds;
+        let isRunning = false;
+        const defaultTitle = document.title;
+        
+        // --- Fonction pour afficher le temps formaté ---
+        function displayTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            
+            // Ajoute un '0' devant les secondes si < 10 (ex: 1:05)
+            const displayStr = `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+            
+            display.textContent = displayStr;
+            
+            // Met à jour le titre de l'onglet (utile !)
+            if (isRunning) {
+                document.title = `${displayStr} - ${defaultTitle}`;
+            }
+        }
+
+        // --- Fonction pour démarrer le timer ---
+        function startTimer() {
+            if (isRunning) return; // Sécurité pour ne pas lancer 2 timers
+            
+            isRunning = true;
+            display.classList.add('running'); // Ajoute la classe pour le style CSS
+            options.classList.add('hidden'); // Cache les boutons de choix
+
+            displayTime(totalSeconds); // Affiche le temps de départ immédiatement
+
+            countdown = setInterval(() => {
+                totalSeconds--;
+                displayTime(totalSeconds);
+
+                // --- Quand le timer arrive à zéro ---
+                if (totalSeconds <= 0) {
+                    stopTimer(true); // Arrête le timer
+                    alarmSound.play(); // Joue le son
+                    document.title = "FINI ! - " + defaultTitle;
+                    
+                    // Réaffiche les options après 2 secondes
+                    setTimeout(() => {
+                        options.classList.remove('hidden');
+                        document.title = defaultTitle;
+                    }, 2000);
+                }
+            }, 1000); // Met à jour chaque seconde
+        }
+
+        // --- Fonction pour arrêter le timer ---
+        // 'finished' est un booléen pour savoir si le timer s'arrête 
+        // parce qu'il est fini (true) ou s'il est annulé (false)
+        function stopTimer(finished = false) {
+            clearInterval(countdown);
+            isRunning = false;
+            display.classList.remove('running');
+            document.title = defaultTitle;
+            
+            if (!finished) {
+                // Si annulé, on remet tout à zéro tout de suite
+                display.textContent = "0:00";
+                options.classList.remove('hidden');
+            }
+            // Si 'finished' est true, on laisse "0:00" et le startTimer gère la suite
+        }
+
+        // 1. Clic sur l'affichage du temps
+        display.addEventListener('click', () => {
+            if (isRunning) {
+                stopTimer(false); // Annule le timer en cours
+            } else {
+                // S'il n'y a pas de timer, cliquer affiche/cache les options
+                options.classList.toggle('hidden');
+            }
+        });
+
+        // 2. Clic sur un des boutons de temps
+        buttons.forEach(button => {
+            button.addEventListener('click', () => {
+                // Récupère le temps en secondes depuis l'attribut 'data-time'
+                totalSeconds = parseInt(button.dataset.time);
+                startTimer();
+            });
+        });
+        
+        // Initialiser l'affichage à 0:00
+        displayTime(0);
+        // Cacher les options au début (commentez cette ligne si vous voulez les voir direct)
+        options.classList.add('hidden');
     });
   </script>
 
